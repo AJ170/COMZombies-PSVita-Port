@@ -11,14 +11,14 @@ public class InputHelper : MonoBehaviour
         List<Touch> touches = new List<Touch>();
         touches.AddRange(Input.touches);
         if (lastFakeTouch == null) lastFakeTouch = new TouchCreator();
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetButtonDown("Fire1"))
         {
             lastFakeTouch.phase = TouchPhase.Began;
             lastFakeTouch.deltaPosition = new Vector2(0, 0);
             lastFakeTouch.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             lastFakeTouch.fingerId = 0;
         }
-        else if (Input.GetMouseButtonUp(0))
+        else if (Input.GetButtonUp("Fire1"))
         {
             lastFakeTouch.phase = TouchPhase.Ended;
             Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
@@ -26,7 +26,7 @@ public class InputHelper : MonoBehaviour
             lastFakeTouch.position = newPosition;
             lastFakeTouch.fingerId = 0;
         }
-        else if (Input.GetMouseButton(0))
+        else if (Input.GetButton("Fire1"))
         {
             lastFakeTouch.phase = TouchPhase.Moved;
             Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);

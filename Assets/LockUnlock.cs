@@ -8,10 +8,10 @@ public class LockUnlock : MonoBehaviour {
 		DontDestroyOnLoad(base.gameObject);
 	}
 	void Update () {
-					if (Input.GetKeyDown(KeyCode.F1))
+					if (Screen.lockCursor == true)
 			{
-				Cursor.visible = !Cursor.visible;
-				Screen.lockCursor = !Screen.lockCursor;
+				Cursor.visible = true;
+				Screen.lockCursor = false;
 			}
 	}
 }

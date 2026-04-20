@@ -107,9 +107,14 @@ public class TPSSimpleCameraScript : BaseCameraScript
 		}
 		else
 		{
-			float x = player.InputController.CameraRotation.x;
+#if UNITY_PSP2 && !UNITY_EDITOR
+            float x = Input.GetAxis("Mouse X") * 50f * Time.deltaTime;
+            float y = Input.GetAxis("Mouse Y") * 50f * Time.deltaTime;
+#else
+            float x = player.InputController.CameraRotation.x;
 			float y = player.InputController.CameraRotation.y;
-			if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.Android && player.InputController.EnableTurningAround)
+#endif
+            if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.Android && player.InputController.EnableTurningAround)
 			{
 				if (Screen.lockCursor)
 				{

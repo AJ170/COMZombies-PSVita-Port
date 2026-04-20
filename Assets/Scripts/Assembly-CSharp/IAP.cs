@@ -19,15 +19,15 @@ public class IAP
 			return;
 		}
 		Debug.Log("Now consume PurchaseProduct ANDROID");
-		if (GoogleIABManager.is_billingSupported)
-		{
+		//if (GoogleIABManager.is_billingSupported)
+		//{
 			GoogleIAB.purchaseProduct(productId);
 			GoogleIABEventListener.ProductID = productId;
-		}
-		else
-		{
-			Debug.LogError("billing not Supported!");
-		}
+		//}
+		//else
+		//{
+			//Debug.LogError("billing not Supported!");
+		//}
 	}
 
 	public static int purchaseStatus(object stateInfo)

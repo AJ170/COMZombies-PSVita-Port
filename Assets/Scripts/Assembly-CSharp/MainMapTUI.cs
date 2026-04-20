@@ -474,17 +474,17 @@ public class MainMapTUI : MonoBehaviour, TUIHandler
 			audioPlayer.PlayAudio("Button");
 			if (GameApp.GetInstance().GetGameState().show_zombies2_link)
 			{
-				Application.OpenURL("https://itunes.apple.com/us/app/call-of-mini-zombies-2/id605681399?ls=1&mt=8");
+				//Application.OpenURL("https://itunes.apple.com/us/app/call-of-mini-zombies-2/id605681399?ls=1&mt=8");
 			}
 			else
 			{
-				Application.OpenURL("https://itunes.apple.com/us/app/call-of-mini-infinity/id605676336?ls=1&mt=8");
+				//Application.OpenURL("https://itunes.apple.com/us/app/call-of-mini-infinity/id605676336?ls=1&mt=8");
 			}
 		}
 		else if (control.name == "DinoHunter" && eventType == 3)
 		{
 			audioPlayer.PlayAudio("Button");
-			Application.OpenURL("https://itunes.apple.com/us/app/call-of-mini-dinohunter/id605678478?ls=1&mt=8");
+			//Application.OpenURL("https://itunes.apple.com/us/app/call-of-mini-dinohunter/id605678478?ls=1&mt=8");
 		}
 	}
 
