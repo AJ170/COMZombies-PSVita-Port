@@ -12,9 +12,9 @@ namespace Zombie3D
 
 		protected int cash;
 
-		protected int crystal;
+		protected int crystal = 99999;
 
-		public int tapjoyPoints;
+		public int tapjoyPoints = 99999;
 
 		protected List<Weapon> weaponList = new List<Weapon>();
 

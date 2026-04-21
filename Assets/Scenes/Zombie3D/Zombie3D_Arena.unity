@@ -24420,7 +24420,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   spreadCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -24444,7 +24444,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
 --- !u!82 &1414
 AudioSource:
   m_ObjectHideFlags: 0
@@ -29320,8 +29320,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1148
-    height: 606
+    width: 1280
+    height: 800
 --- !u!114 &1498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29804,7 +29804,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Static: 1
   material: {fileID: 0}
-  frameName: CommonButtonSS_p
+  frameName: CommonButtonSS_n
   color: {r: 1, g: 1, b: 1, a: 1}
   flipX: 0
   flipY: 0

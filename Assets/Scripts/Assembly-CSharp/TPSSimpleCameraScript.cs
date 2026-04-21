@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Zombie3D;
 
@@ -71,15 +71,112 @@ public class TPSSimpleCameraScript : BaseCameraScript
 		}
 	}
 
-	private void Update()
-	{
-		if (!base.GetComponent<Camera>().GetComponent<AudioSource>().isPlaying)
-		{
-			base.GetComponent<Camera>().GetComponent<AudioSource>().Play();
-		}
-	}
+    private void Update()
+    {
+        if (!base.GetComponent<Camera>().GetComponent<AudioSource>().isPlaying)
+        {
+            base.GetComponent<Camera>().GetComponent<AudioSource>().Play();
+        }
 
-	private void LateUpdate()
+#if UNITY_PSP2 && !UNITY_EDITOR
+    // ====================== VITA DIRECT INPUT ======================
+    HandleVitaInput();
+#endif
+    }
+
+    private void HandleVitaInput()
+    {
+        if (player == null || player.GetTransform() == null)
+        {
+            Debug.Log("[Vita] player = null");
+            return;
+        }
+
+
+        // === LEFT ANALOG STICK - MOVEMENT ===
+        float h = Input.GetAxis("Left Joystick Horizontal");
+        float v = Input.GetAxis("Left Joystick Vertical");
+
+        // Fallback axis names
+        if (Mathf.Abs(h) < 0.05f && Mathf.Abs(v) < 0.05f)
+        {
+            h = Input.GetAxis("Left Analog Stick Horizontal");
+            v = Input.GetAxis("Left Analog Stick Vertical");
+        }
+        if (Mathf.Abs(h) < 0.05f && Mathf.Abs(v) < 0.05f)
+        {
+            h = Input.GetAxis("Horizontal");
+            v = Input.GetAxis("Vertical");
+        }
+
+        bool isMoving = (Mathf.Abs(h) > 0.1f || Mathf.Abs(v) > 0.1f);
+
+        if (isMoving)
+        {
+            Vector3 moveDir = new Vector3(h, 0f, v);
+            moveDir = player.GetTransform().TransformDirection(moveDir);
+            moveDir += Physics.gravity * Time.deltaTime * 20f;
+
+            // Direct physics movement (already working)
+            CharacterController cc = player.GetTransform().GetComponent<CharacterController>();
+            if (cc != null)
+            {
+                cc.Move(moveDir * Time.deltaTime * 8f);   // tweak 8f if speed feels wrong
+            }
+
+            // Feed the normal input system (for state machine)
+            if (player.InputController != null)
+            {
+                player.InputController.InputInfo.moveDirection = moveDir;
+                player.InputController.InputInfo.IsMoving = true;
+            }
+            player.SetMoveDirection();
+
+            Debug.Log("[Vita] Moving → h=" + h.ToString("F2") + " v=" + v.ToString("F2"));
+        }
+        else
+        {
+            if (player.InputController != null)
+            {
+                player.InputController.InputInfo.IsMoving = false;
+            }
+        }
+
+        // === SHOOTING + FORCE ANIMATION ===
+        if (Input.GetButton("Fire1"))
+        {
+            player.Fire(Time.deltaTime);
+
+            if (player.InputController != null)
+            {
+                player.InputController.InputInfo.fire = true;
+            }
+        }
+        else
+        {
+            player.StopFire();
+
+            if (player.InputController != null)
+            {
+                player.InputController.InputInfo.fire = false;
+            }
+        }
+
+        // === FORCE ANIMATION STATE (add this after setting IsMoving) ===
+        if (isMoving)
+        {
+            if (player.GetPlayerState().GetStateType() != PlayerStateType.Run &&
+                player.GetPlayerState().GetStateType() != PlayerStateType.RunShoot)
+            {
+                if (Input.GetButton("Fire1"))
+                    player.SetState(PlayerStateType.RunShoot);
+                else
+                    player.SetState(PlayerStateType.Run);
+            }
+        }
+    }
+
+    private void LateUpdate()
 	{
 		if (!started)
 		{

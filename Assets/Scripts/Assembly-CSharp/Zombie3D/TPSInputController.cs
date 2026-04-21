@@ -122,7 +122,7 @@ namespace Zombie3D
             }
         }
 
-        public override void ProcessInput(float deltaTime, InputInfo inputInfo)
+        /*public override void ProcessInput(float deltaTime, InputInfo inputInfo)
         {
             // This is the PC/Editor + keyboard path (WASD + weapon hotkeys)
             if (base.EnableMoveInput)
@@ -146,6 +146,63 @@ namespace Zombie3D
             }
 
             // Weapon switching + debug keys (PC only)
+            List<Weapon> battleWeapons = GameApp.GetInstance().GetGameState().GetBattleWeapons();
+            for (int i = 1; i <= battleWeapons.Count; i++)
+            {
+                if (Input.GetButton("Weapon" + i) && player.GetWeapon().Name != battleWeapons[i - 1].Name)
+                {
+                    player.ChangeWeaponAndSendMsg(i - 1);
+                }
+            }
+            if (Input.GetButton("H"))
+            {
+                player.GetHealed((int)player.MaxHp);
+            }
+            if (Input.GetButtonDown("K"))
+            {
+                player.enableHit = !player.enableHit;
+            }
+            if (Input.GetButtonDown("N"))
+            {
+                GameObject.Find("ArenaTrigger").GetComponent<ArenaTriggerFromConfigScript>().enabled = false;
+                GameApp.GetInstance().GetGameScene().GamePlayingState = PlayingState.GameWin;
+                GameApp.GetInstance().GetGameState().DayUp();
+                GameApp.GetInstance().Save();
+                SceneName.LoadLevel("MainMapTUI");
+            }
+        }*/
+
+       public override void ProcessInput(float deltaTime, InputInfo inputInfo)
+        {
+#if UNITY_PSP2 && !UNITY_EDITOR
+        inputInfo.moveDirection = new Vector3(Input.GetAxis("Left Joystick Horizontal"), 0f, Input.GetAxis("Left Joystick Vertical"));
+        inputInfo.moveDirection = player.GetTransform().TransformDirection(inputInfo.moveDirection);
+        inputInfo.IsMoving = true;
+
+#else
+            // ====================== PC/EDITOR KEYBOARD (unchanged) ======================
+            if (base.EnableMoveInput)
+    {
+        inputInfo.moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+        inputInfo.moveDirection = player.GetTransform().TransformDirection(inputInfo.moveDirection);
+        inputInfo.IsMoving = true;
+    }
+#endif
+
+            // Shared code (runs on both PC and Vita)
+            inputInfo.moveDirection += Physics.gravity * deltaTime * 20f;
+            player.SetMoveDirection();
+
+            if (inputInfo.moveDirection.x != 0f || inputInfo.moveDirection.z != 0f)
+            {
+                inputInfo.IsMoving = true;
+            }
+            else
+            {
+                inputInfo.IsMoving = false;
+            }
+
+            // PC-only weapon switching + debug keys (won't affect Vita)
             List<Weapon> battleWeapons = GameApp.GetInstance().GetGameState().GetBattleWeapons();
             for (int i = 1; i <= battleWeapons.Count; i++)
             {
