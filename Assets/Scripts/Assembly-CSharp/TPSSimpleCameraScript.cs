@@ -14,6 +14,10 @@ public class TPSSimpleCameraScript : BaseCameraScript
 	public Texture leftBottomReticle;
 
 	public Texture rightBottomReticle;
+	
+	private float stickHeldTime = 0f;
+	private const float sensitivityRampDelay = 1f;
+	private const float sensitivityRampMultiplier = 2.5f;
 
 	protected Shader transparentShader;
 
@@ -30,6 +34,11 @@ public class TPSSimpleCameraScript : BaseCameraScript
 	protected float winTime = -1f;
 
 	private bool lockCamera;
+	
+	private  bool pauseMenu = false;
+
+	// Track previous fire state so we only call OnFireBegin/StopFire on edges
+	private bool wasFirePressed = false;
 
 	private void Awake()
 	{
@@ -71,112 +80,153 @@ public class TPSSimpleCameraScript : BaseCameraScript
 		}
 	}
 
-    private void Update()
-    {
-        if (!base.GetComponent<Camera>().GetComponent<AudioSource>().isPlaying)
-        {
-            base.GetComponent<Camera>().GetComponent<AudioSource>().Play();
-        }
+	private void Update()
+	{
+		if (!base.GetComponent<Camera>().GetComponent<AudioSource>().isPlaying)
+		{
+			base.GetComponent<Camera>().GetComponent<AudioSource>().Play();
+		}
 
 #if UNITY_PSP2 && !UNITY_EDITOR
-    // ====================== VITA DIRECT INPUT ======================
-    HandleVitaInput();
+		HandleVitaInput();
 #endif
-    }
+	}
 
-    private void HandleVitaInput()
+	private void HandleVitaInput()
+	{
+	
+		/*Debug.Log("IsMoving: " + player.InputController.InputInfo.IsMoving + 
+		          " | State: " + player.GetPlayerState().GetStateType() + 
+		          " | MoveSpeed: " + player.MoveSpeed);*/
+		if (player == null || player.GetTransform() == null)
+		{
+			Debug.Log("[Vita] player = null");
+			return;
+		}
+
+		float h = Input.GetAxis("Left Joystick Horizontal");
+		float v = Input.GetAxis("Left Joystick Vertical");
+
+		bool isMoving = (Mathf.Abs(h) > 0.1f || Mathf.Abs(v) > 0.1f);
+
+		if (isMoving)
+		{
+			Vector3 moveDir = new Vector3(h, 0f, v);
+			moveDir = player.GetTransform().TransformDirection(moveDir);
+			moveDir += Physics.gravity * Time.deltaTime * 20f;
+
+			CharacterController cc = player.GetTransform().GetComponent<CharacterController>();
+			if (cc != null)
+			{
+				cc.Move(moveDir * Time.deltaTime * 2f);
+			}
+
+			if (player.InputController != null)
+			{
+				player.InputController.InputInfo.moveDirection = moveDir;
+				player.InputController.InputInfo.IsMoving = true;
+			}
+			player.SetMoveDirection();
+		}
+		else
+		{
+			if (player.InputController != null)
+			{
+				player.InputController.InputInfo.IsMoving = false;
+			}
+		}
+
+		// === SHOOTING - edge triggered so the state machine handles animations ===
+		bool firePressed = Input.GetButton("Fire1");
+
+		if (firePressed && !wasFirePressed)
+		{
+			// Button just pressed this frame
+			player.OnFireBegin();
+			if (player.InputController != null)
+			{
+				player.InputController.InputInfo.fire = true;
+				//Debug.Log("Fire = true");
+			}
+		}
+		else if (!firePressed && wasFirePressed)
+		{
+			// Button just released this frame
+			player.StopFire();
+			if (player.InputController != null)
+			{
+				player.InputController.InputInfo.fire = false;
+				//Debug.Log("Fire = false");
+			}
+		}
+
+		wasFirePressed = firePressed; 
+		
+		if (Input.GetButtonDown("Start Button"))
+{
+    if (!pauseMenu)
     {
-        if (player == null || player.GetTransform() == null)
-        {
-            Debug.Log("[Vita] player = null");
-            return;
-        }
-
-
-        // === LEFT ANALOG STICK - MOVEMENT ===
-        float h = Input.GetAxis("Left Joystick Horizontal");
-        float v = Input.GetAxis("Left Joystick Vertical");
-
-        // Fallback axis names
-        if (Mathf.Abs(h) < 0.05f && Mathf.Abs(v) < 0.05f)
-        {
-            h = Input.GetAxis("Left Analog Stick Horizontal");
-            v = Input.GetAxis("Left Analog Stick Vertical");
-        }
-        if (Mathf.Abs(h) < 0.05f && Mathf.Abs(v) < 0.05f)
-        {
-            h = Input.GetAxis("Horizontal");
-            v = Input.GetAxis("Vertical");
-        }
-
-        bool isMoving = (Mathf.Abs(h) > 0.1f || Mathf.Abs(v) > 0.1f);
-
-        if (isMoving)
-        {
-            Vector3 moveDir = new Vector3(h, 0f, v);
-            moveDir = player.GetTransform().TransformDirection(moveDir);
-            moveDir += Physics.gravity * Time.deltaTime * 20f;
-
-            // Direct physics movement (already working)
-            CharacterController cc = player.GetTransform().GetComponent<CharacterController>();
-            if (cc != null)
-            {
-                cc.Move(moveDir * Time.deltaTime * 8f);   // tweak 8f if speed feels wrong
-            }
-
-            // Feed the normal input system (for state machine)
-            if (player.InputController != null)
-            {
-                player.InputController.InputInfo.moveDirection = moveDir;
-                player.InputController.InputInfo.IsMoving = true;
-            }
-            player.SetMoveDirection();
-
-            Debug.Log("[Vita] Moving → h=" + h.ToString("F2") + " v=" + v.ToString("F2"));
-        }
-        else
-        {
-            if (player.InputController != null)
-            {
-                player.InputController.InputInfo.IsMoving = false;
-            }
-        }
-
-        // === SHOOTING + FORCE ANIMATION ===
-        if (Input.GetButton("Fire1"))
-        {
-            player.Fire(Time.deltaTime);
-
-            if (player.InputController != null)
-            {
-                player.InputController.InputInfo.fire = true;
-            }
-        }
-        else
-        {
-            player.StopFire();
-
-            if (player.InputController != null)
-            {
-                player.InputController.InputInfo.fire = false;
-            }
-        }
-
-        // === FORCE ANIMATION STATE (add this after setting IsMoving) ===
-        if (isMoving)
-        {
-            if (player.GetPlayerState().GetStateType() != PlayerStateType.Run &&
-                player.GetPlayerState().GetStateType() != PlayerStateType.RunShoot)
-            {
-                if (Input.GetButton("Fire1"))
-                    player.SetState(PlayerStateType.RunShoot);
-                else
-                    player.SetState(PlayerStateType.Run);
-            }
-        }
+        pauseMenu = true;
+        Time.timeScale = 0f;
+        GameUIScriptNew.GetGameUIScript().ShowPausePanel();
+        OpenClikPlugin.Show(true);
     }
+    else
+    {
+        pauseMenu = false;
+        Time.timeScale = 1f;
+        GameUIScriptNew.GetGameUIScript().HidePausePanel();
+        OpenClikPlugin.Hide();
+    }
+}
+		
+		GameUIScriptNew gui = GameUIScriptNew.GetGameUIScript();
+		if (gui != null && gui.uiInited)
+		{
+			if (Input.GetButtonDown("DPad Left"))
+			{
+				UseCarryItem(gui, 1);
+			}
+			else if (Input.GetButtonDown("DPad Right"))
+			{
+				UseCarryItem(gui, 0);
+			}
+		}
 
-    private void LateUpdate()
+		
+		if (Input.GetButtonDown("Triangle Button"))
+		{
+			if (player.PlayerBonusState == null || player.PlayerBonusState.StateType != PlayerBonusStateType.Suicidegun)
+			{
+				player.NextWeapon();
+			}
+		}
+		//Debug.Log("HandleVitaInput running, isMoving: " + (Mathf.Abs(h) > 0.1f || Mathf.Abs(v) > 0.1f));
+		
+	}
+
+	private void UseCarryItem(GameUIScriptNew gui, int slot)
+	{
+		if (gui.itemInfo == null) return;
+		if (gui.itemInfo.itemLogo == null || gui.itemInfo.itemLogo.Length <= slot) return;
+
+		string frameName = gui.itemInfo.itemLogo[slot].frameName_Accessor;
+		if (string.IsNullOrEmpty(frameName) || !frameName.StartsWith("item_")) return;
+
+		ItemType itemType = Item.GetItemTypeByName(frameName.Substring("item_".Length));
+		GameState gameState = GameApp.GetInstance().GetGameState();
+
+		if (gui.itemInfo.isBuyItem[slot])
+		{
+			gameState.BuyItem(gameState.GetItemByType(itemType));
+			player.carryItemsPacket[itemType] = gameState.GetItemByType(itemType).OwnedCount;
+			gui.itemInfo.UpdateCarryItemPacket(itemType, player.carryItemsPacket[itemType]);
+		}
+
+		player.OnUseCarryItem(itemType);
+	}
+	
+	private void LateUpdate()
 	{
 		if (!started)
 		{
@@ -204,19 +254,32 @@ public class TPSSimpleCameraScript : BaseCameraScript
 		}
 		else
 		{
-#if UNITY_PSP2 && !UNITY_EDITOR
-            float x = Input.GetAxis("Mouse X") * 50f * Time.deltaTime;
-            float y = Input.GetAxis("Mouse Y") * 50f * Time.deltaTime;
-#else
-            float x = player.InputController.CameraRotation.x;
-			float y = player.InputController.CameraRotation.y;
-#endif
-            if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.Android && player.InputController.EnableTurningAround)
+//right joystick camera sensitivity stuff
+			float rawX = Input.GetAxis("Mouse X");
+			float rawY = Input.GetAxis("Mouse Y");
+
+// Track how long the stick has been held
+			if (Mathf.Abs(rawX) > 0.1f || Mathf.Abs(rawY) > 0.1f)
+			{
+				stickHeldTime += Time.deltaTime;
+			}
+			else
+			{
+				stickHeldTime = 0f; // reset when stick is released
+			}
+
+// After 1 second, ramp up sensitivity
+			float rampMultiplier = (stickHeldTime >= sensitivityRampDelay) ? sensitivityRampMultiplier : 1f;
+
+			float x = rawX * 50f * Time.deltaTime * rampMultiplier;
+			float y = rawY * 50f * Time.deltaTime * rampMultiplier;
+
+			if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.Android && player.InputController.EnableTurningAround)
 			{
 				if (Screen.lockCursor)
 				{
-					x = Input.GetAxis("Mouse X") * 50f * Time.deltaTime;
-					y = Input.GetAxis("Mouse Y") * 50f * Time.deltaTime;
+					x = rawX * 50f * Time.deltaTime * rampMultiplier;
+					y = rawY * 50f * Time.deltaTime * rampMultiplier;
 				}
 			}
 			if (Time.timeScale != 0f)

@@ -22,11 +22,10 @@ namespace Zombie3D
 			}
 			if (base.EnableMoveInput)
 			{
-#if UNITY_PSP2 && !UNITY_EDITOR
-	   inputInfo.moveDirection = new Vector3(Input.GetAxis("Left Joystick Horizontal"), 0f, Input.GetAxis("Left Joystick Vertical"));
-#else
+
+
                 inputInfo.moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
-#endif
+
                 inputInfo.moveDirection = player.GetTransform().TransformDirection(inputInfo.moveDirection);
 				inputInfo.IsMoving = true;
 			}

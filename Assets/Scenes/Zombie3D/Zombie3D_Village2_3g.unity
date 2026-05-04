@@ -4143,7 +4143,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &245
 GameObject:
   m_ObjectHideFlags: 0
@@ -5924,7 +5924,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &347
 GameObject:
   m_ObjectHideFlags: 0
@@ -6671,7 +6671,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &390
 GameObject:
   m_ObjectHideFlags: 0
@@ -11581,7 +11581,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 287}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 129.69077, y: -64.87622, z: -10}
+  m_LocalPosition: {x: 129.69077, y: -153.9, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 733}
@@ -11661,7 +11661,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 293}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 85.5, y: 35.158165, z: -3}
+  m_LocalPosition: {x: 85.5, y: 32.21, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 820}
@@ -31294,7 +31294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Static: 1
   material: {fileID: 0}
-  frameName: CommonButtonSS_n
+  frameName: CommonButtonSS_p
   color: {r: 1, g: 1, b: 1, a: 1}
   flipX: 0
   flipY: 0
@@ -39866,8 +39866,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1148
-    height: 606
+    width: 1280
+    height: 800
 --- !u!114 &1845
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -938,9 +938,10 @@ namespace Zombie3D
 				SendNetUserStatusMsg();
 				last_user_status_time = Time.time;
 			}
-		}
 
-		public void SendNetUserStatusMsg()
+        }
+
+        public void SendNetUserStatusMsg()
 		{
 			if (GameApp.GetInstance().GetGameState().gameMode == GameMode.Coop)
 			{
@@ -1347,14 +1348,19 @@ namespace Zombie3D
 			case ItemType.FireGun:
 			case ItemType.ElectricGun:
 				audioPlayer.PlayAudio("GetBullet");
-				if (cur_weapon.WeaponBulletObject.GetComponent<ItemScript>().itemType == type)
+				if (cur_weapon.WeaponBulletObject != null &&
+				    cur_weapon.WeaponBulletObject.GetComponent<ItemScript>() != null &&
+				    cur_weapon.WeaponBulletObject.GetComponent<ItemScript>().itemType == type)
 				{
 					cur_weapon.AddBullets(cur_weapon.WConf.bulletEachAdd / 4);
 					break;
 				}
 				foreach (Weapon weapon in weaponList)
-				{
-					if (weapon.Name != cur_weapon.Name && weapon.WeaponBulletObject.GetComponent<ItemScript>().itemType == type)
+				{ 
+					if (weapon.Name != cur_weapon.Name &&
+					    weapon.WeaponBulletObject != null &&
+					    weapon.WeaponBulletObject.GetComponent<ItemScript>() != null &&
+					    weapon.WeaponBulletObject.GetComponent<ItemScript>().itemType == type)
 					{
 						weapon.AddBullets(weapon.WConf.bulletEachAdd / 4);
 						break;

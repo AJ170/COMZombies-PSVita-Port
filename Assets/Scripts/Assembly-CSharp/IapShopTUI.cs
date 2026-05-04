@@ -76,23 +76,23 @@ public class IapShopTUI : MonoBehaviour, TUIHandler
 	{
 		if (GameApp.GetInstance().GetGameState().soldOutNewbie1)
 		{
-			m_tui.transform.Find("TUIControl/TUIScrollObj/iap2/Newbie1").GetComponent<TUIButtonClick>().enabled = false;
-			m_tui.transform.Find("TUIControl/TUIScrollObj/iap2/Newbie1/soldout").gameObject.SetActive(true);
+			m_tui.transform.Find("TUIControl/TUIScrollObj/iap1/Newbie1").GetComponent<TUIButtonClick>().enabled = false;
+			m_tui.transform.Find("TUIControl/TUIScrollObj/iap1/Newbie1/soldout").gameObject.SetActive(true);
 		}
 		else
 		{
-			m_tui.transform.Find("TUIControl/TUIScrollObj/iap2/Newbie1").GetComponent<TUIButtonClick>().enabled = true;
-			m_tui.transform.Find("TUIControl/TUIScrollObj/iap2/Newbie1/soldout").gameObject.SetActive(false);
+			m_tui.transform.Find("TUIControl/TUIScrollObj/iap1/Newbie1").GetComponent<TUIButtonClick>().enabled = true;
+			m_tui.transform.Find("TUIControl/TUIScrollObj/iap1/Newbie1/soldout").gameObject.SetActive(false);
 		}
 		if (GameApp.GetInstance().GetGameState().soldOutNewbie2)
 		{
-			m_tui.transform.Find("TUIControl/TUIScrollObj/iap2/Newbie2").GetComponent<TUIButtonClick>().enabled = false;
-			m_tui.transform.Find("TUIControl/TUIScrollObj/iap2/Newbie2/soldout").gameObject.SetActive(true);
+			m_tui.transform.Find("TUIControl/TUIScrollObj/iap1/Newbie2").GetComponent<TUIButtonClick>().enabled = false;
+			m_tui.transform.Find("TUIControl/TUIScrollObj/iap1/Newbie2/soldout").gameObject.SetActive(true);
 		}
 		else
 		{
-			m_tui.transform.Find("TUIControl/TUIScrollObj/iap2/Newbie2").GetComponent<TUIButtonClick>().enabled = true;
-			m_tui.transform.Find("TUIControl/TUIScrollObj/iap2/Newbie2/soldout").gameObject.SetActive(false);
+			m_tui.transform.Find("TUIControl/TUIScrollObj/iap1/Newbie2").GetComponent<TUIButtonClick>().enabled = true;
+			m_tui.transform.Find("TUIControl/TUIScrollObj/iap1/Newbie2/soldout").gameObject.SetActive(false);
 		}
 	}
 
@@ -245,10 +245,14 @@ public class IapShopTUI : MonoBehaviour, TUIHandler
 	{
 		if (iapProcessing == IAPName.None)
 		{
-			IAP.NowPurchaseProduct(item.ID, "1");
 			iapProcessing = item.Name;
 			Debug.Log("IAP ID:" + item.ID);
-			ShowMask(true);
+			
+        GameApp.GetInstance().GetGameState().DeliverIAPItem(iapProcessing);
+        iapProcessing = IAPName.None;
+        RefreshCashLebel();
+        CheckNiewbieSoldout();
+
 		}
 		yield return 0;
 	}

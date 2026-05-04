@@ -13,16 +13,24 @@ public class ScreenBloodScript : MonoBehaviour
 	public string alphaPropertyName = "_Alpha";
 
 	private void Start()
-	{
-		alpha = base.GetComponent<Renderer>().material.GetFloat(alphaPropertyName);
-		startTime = Time.time;
-		if (Mathf.Max(Screen.width, Screen.height) >= 960)
-		{
-			float num = (float)Screen.width / 960f;
-			float num2 = (float)Screen.height / 640f;
-			base.transform.localScale = new Vector3(4.2f * num, 2.8f * num2, 0.5f);
-		}
-	}
+{
+    alpha = base.GetComponent<Renderer>().material.GetFloat(alphaPropertyName);
+    startTime = Time.time;
+
+#if UNITY_PSP2 && !UNITY_EDITOR
+    // Vita is 960x544 — scale to fill exactly
+    float vitaW = (float)Screen.width / 800f;
+    float vitaH = (float)Screen.height / 544f;
+    base.transform.localScale = new Vector3(4.2f * vitaW, 2.8f * vitaH, 0.5f);
+#else
+    if (Mathf.Max(Screen.width, Screen.height) >= 960)
+    {
+        float num = (float)Screen.width / 960f;
+        float num2 = (float)Screen.height / 640f;
+        base.transform.localScale = new Vector3(4.2f * num, 2.8f * num2, 0.5f);
+    }
+#endif
+}
 
 	public void NewBlood(float damage)
 	{

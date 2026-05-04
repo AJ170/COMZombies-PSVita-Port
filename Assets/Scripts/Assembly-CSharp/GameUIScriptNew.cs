@@ -329,7 +329,7 @@ public class GameUIScriptNew : MonoBehaviour, TUIHandler, ITutorialGameUI
 
 	void FixedUpdate()
 	{
-		if (!Application.isMobilePlatform)
+		/*if (!Application.isMobilePlatform)
 		{
 			List<Weapon> weapons = GameApp.GetInstance().GetGameState().GetWeapons();
 			if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -353,7 +353,7 @@ public class GameUIScriptNew : MonoBehaviour, TUIHandler, ITutorialGameUI
 			player.InputController.InputInfo.moveDirection += Physics.gravity * Time.deltaTime * 20f;
 			player.SetMoveDirection();
 			player.InputController.InputInfo.IsMoving = Input.GetKey("w") || Input.GetKey("a") || Input.GetKey("s") || Input.GetKey("d");
-		}
+		}*/
 	}
 
 	public void HandleEvent(TUIControl control, int eventType, float wparam, float lparam, object data)
