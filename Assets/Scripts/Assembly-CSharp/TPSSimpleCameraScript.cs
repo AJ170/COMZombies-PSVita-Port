@@ -16,7 +16,7 @@ public class TPSSimpleCameraScript : BaseCameraScript
 	public Texture rightBottomReticle;
 	
 	private float stickHeldTime = 0f;
-	private const float sensitivityRampDelay = 1f;
+	private const float sensitivityRampDelay = 0.6f;
 	private const float sensitivityRampMultiplier = 2.5f;
 
 	protected Shader transparentShader;
